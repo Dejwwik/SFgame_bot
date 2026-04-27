@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Logs - {{ name }} ({{ server }}){% endblock %}
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+        <h1 style="margin: 0;">{{ name }}</h1>
+        <p class="muted text-sm" style="margin-top: 4px;">{{ server }}</p>
+    </div>
+    <div class="actions">
+        <form method="post" action="{{ url_for('clear_character_logs', character_id=character_id) }}" style="display:inline" onsubmit="return confirm('Clear logs for {{ name }}?')">
+            <button type="submit" class="btn btn-danger btn-sm">Clear Logs</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-outline btn-sm">Back</a>
+    </div>
+</div>
+
+<div class="card" style="padding: 16px;">
+    {% if content %}
+    <pre style="margin: 0; font-size: 12px; line-height: 1.6; color: #c9d1d9; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 70vh; overflow-y: auto;">{{ content }}</pre>
+    {% else %}
+    <p class="muted">No log file found.</p>
+    {% endif %}
+</div>
+
+<script>
+var pre = document.querySelector('pre');
+if (pre) pre.scrollTop = pre.scrollHeight;
+</script>
+{% endblock %}

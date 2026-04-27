@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Select Characters - SFgame Bot{% endblock %}
+{% block content %}
+<h1>Select Characters</h1>
+<p class="muted text-sm" style="margin-bottom: 16px;">Account: <strong>{{ username }}</strong> — {{ characters|length }} character(s) found</p>
+
+<div class="card">
+    <form method="post" action="{{ url_for('save_characters') }}">
+        <input type="hidden" name="account_id" value="{{ account_id }}">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 40px;"></th>
+                    <th>Name</th>
+                    <th>Server</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in characters %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="characters"
+                               value='{{ {"name": c.name, "character_id": c.character_id, "server_url": c.server_url} | tojson }}'
+                               {% if c.server_url %}checked{% endif %}>
+                    </td>
+                    <td><strong>{{ c.name }}</strong></td>
+                    <td>{{ c.server_url or ("Server ID: " ~ c.server_id) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 16px;">
+            <button type="submit" class="btn btn-primary">Save Selected Characters</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

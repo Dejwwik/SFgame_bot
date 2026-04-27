@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - SFgame Bot{% endblock %}
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <h1 style="margin: 0;">Dashboard</h1>
+    <form method="post" action="{{ url_for('clear_all_logs') }}" style="display:inline" onsubmit="return confirm('Delete ALL log files?')">
+        <button type="submit" class="btn btn-outline btn-sm">Clear All Logs</button>
+    </form>
+</div>
+
+{% if accounts %}
+{% for acct in accounts %}
+<div class="card" style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding-bottom: 4px;" onclick="toggleChars('acct-{{ acct.id }}', this)">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="expand-arrow" style="font-size: 10px; color: #8b949e; transition: transform 0.2s;">&#9654;</span>
+            <a href="{{ url_for('account_detail', account_id=acct.id) }}" style="font-size: 16px; font-weight: 600; color: #e6edf3; text-decoration: none;" onclick="event.stopPropagation();">{{ acct.username }}</a>
+            <span class="badge badge-info">{{ acct.characters | length }}</span>
+        </div>
+        <div class="actions" onclick="event.stopPropagation();">
+            <form method="post" action="{{ url_for('refresh_account', account_id=acct.id) }}" style="display:inline">
+                <button type="submit" class="btn btn-outline btn-sm">Refresh</button>
+            </form>
+            <form method="post" action="{{ url_for('delete_account_route', account_id=acct.id) }}" style="display:inline" onsubmit="return confirm('Delete account {{ acct.username }} and ALL its characters?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="acct-{{ acct.id }}" style="display: none; margin-top: 12px; border-top: 1px solid #21262d; padding-top: 12px;">
+        {% if acct.characters %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Character</th>
+                    <th>Server</th>
+                    <th>Level</th>
+                    <th>Gold</th>
+                    <th>Mushrooms</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in acct.characters %}
+                <tr{% if not c.enabled %} style="opacity: 0.4;"{% endif %}>
+                    <td>
+                        <div><strong>{{ c.name }}</strong></div>
+                        <div class="char-class">{{ c.char_class | display_name }}</div>
+                    </td>
+                    <td class="text-sm muted">{{ c.server }}</td>
+                    <td class="stat-value">{{ '{:,}'.format(c.level) if c.level is not none else '—' }}</td>
+                    <td class="stat-value">{{ '{:,}'.format(c.gold) if c.gold is not none else '—' }}{% if c.silver is not none and c.gold is not none %}<span class="muted" style="font-size:11px">.{{ '%02d' % c.silver }}</span>{% endif %}</td>
+                    <td class="stat-value">{{ '{:,}'.format(c.mushrooms) if c.mushrooms is not none else '—' }}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            {% if c.enabled %}
+                            <span class="badge badge-on">Enabled</span>
+                            {% else %}
+                            <span class="badge badge-off">Disabled</span>
+                            {% endif %}
+                            {% if c.running %}
+                            <span class="badge badge-on">Running</span>
+                            {% else %}
+                            <span class="badge badge-off">Stopped</span>
+                            {% endif %}
+                            {% if c.has_config %}
+                            <span class="badge badge-info">Configured</span>
+                            {% else %}
+                            <span class="badge badge-warn">No config</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions" style="justify-content: flex-end;">
+                            <a href="{{ url_for('config', char_id=c.id) }}" class="btn btn-outline btn-xs">Config</a>
+                            {% if c.enabled %}
+                            {% if c.running %}
+                            <form method="post" action="{{ url_for('pause_character', char_id=c.id) }}" style="display:inline">
+                                <button type="submit" class="btn btn-outline btn-xs">Pause</button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{{ url_for('run_character', char_id=c.id) }}" style="display:inline">
+                                <button type="submit" class="btn btn-success btn-xs">Run</button>
+                            </form>
+                            {% endif %}
+                            {% endif %}
+                            <form method="post" action="{{ url_for('toggle', char_id=c.id) }}" style="display:inline">
+                                <button type="submit" class="btn btn-xs {% if c.enabled %}btn-danger{% else %}btn-primary{% endif %}">
+                                    {{ "Disable" if c.enabled else "Enable" }}
+                                </button>
+                            </form>
+                            <a href="{{ url_for('view_character_logs', character_id=c.character_id) }}" class="btn btn-outline btn-xs">Logs</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted text-sm" style="padding: 8px 0;">No characters linked. Click <strong>Refresh</strong> to fetch from SSO.</p>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card">
+    <p>No accounts configured. <a href="{{ url_for('add_account') }}">Add an account</a> to get started.</p>
+</div>
+{% endif %}
+
+<script>
+var STORAGE_KEY = 'expanded_accounts';
+
+function getExpanded() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e) { return []; }
+}
+
+function setExpanded(ids) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+}
+
+function toggleChars(id, header) {
+    var el = document.getElementById(id);
+    var arrow = header.querySelector('.expand-arrow');
+    var expanded = getExpanded();
+    if (el.style.display === 'none') {
+        el.style.display = 'block';
+        arrow.style.transform = 'rotate(90deg)';
+        if (expanded.indexOf(id) === -1) expanded.push(id);
+    } else {
+        el.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+        expanded = expanded.filter(function(x) { return x !== id; });
+    }
+    setExpanded(expanded);
+}
+
+(function() {
+    var expanded = getExpanded();
+    expanded.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'block';
+            var card = el.parentElement;
+            var arrow = card.querySelector('.expand-arrow');
+            if (arrow) arrow.style.transform = 'rotate(90deg)';
+        }
+    });
+})();
+</script>
+{% endblock %}

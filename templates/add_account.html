@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Login - SFgame Bot{% endblock %}
+{% block content %}
+<h1>Add SFgame Account</h1>
+<div class="card" style="max-width: 400px;">
+    <form method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Login & Fetch Characters</button>
+    </form>
+</div>
+{% endblock %}

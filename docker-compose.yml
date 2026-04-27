@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    image: sfgame_bot
+    container_name: sfgame_web
+    env_file: .env
+    environment:
+      TZ: Europe/Prague
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./logs:/app/logs
+      - ./account_data:/app/account_data
+    command: [ "uv", "run", "web.py" ]
+    restart: unless-stopped
+
+  sfgame_bot:
+    image: sfgame_bot
+    container_name: sfgame_bot
+    environment:
+      TZ: Europe/Prague
+    volumes:
+      - ./logs:/app/logs
+      - ./account_data:/app/account_data
+    restart: unless-stopped
+    depends_on:
+      - web
+
+  cron_crawl:
+    image: sfgame_bot
+    container_name: sfgame_crawl
+    environment:
+      TZ: Europe/Prague
+    volumes:
+      - ./logs:/app/logs
+      - ./account_data:/app/account_data
+    command: [ "uv", "run", "cron_crawl.py" ]
+    restart: unless-stopped
+    depends_on:
+      - web

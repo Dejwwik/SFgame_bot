@@ -1,0 +1,43 @@
+# Version control
+.git/
+.github/
+.gitignore
+
+# Python env & cache
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+*.log
+
+# IDE
+.vscode/
+
+# Tests
+**/tests/
+sfbot/tests/
+
+# Excluded source dirs
+helper_scripts/
+rust_reference/
+sftools_simulations/
+scrapbook_helper/
+
+# Logs & data — bind-mounted at runtime
+logs/
+account_data/
+
+# Secrets & docs
+.env
+.env.example
+AGENTS.MD
+README.md
+info.py
+justfile
+attributes_config.json
+config/
+docker-compose.yml
+Dockerfile
+.dockerignore

@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets
+.env
+
+
+rust_reference/
+.vscode/
+logs/
+dungeon_logs/
+*.db*
+
+attributes_config.json
+account_data/
+helper_scripts/
+sftools_simulations/
+scrapbook_helper/
+

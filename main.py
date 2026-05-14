@@ -78,6 +78,7 @@ from sfbot.underworld.tasks import upgrade_fighters as underworld_fighters_task
 from sfbot.wheel.tasks import spin_wheel as wheel_task
 from sfbot.witch.tasks import buy_enchantments as enchantments_task
 from sfbot.world_boss.tasks import manage_world_boss as world_boss_task
+from sfbot.expedition.tasks import run_expedition as expedition_task
 
 LOOP_SLEEP = 180
 JITTER_MAX = 60
@@ -247,6 +248,7 @@ async def run_account(bot: Bot) -> None:
                 await run_task(bot, feed_pet_task)
                 await run_task(bot, legendary_dungeon_task)
                 await run_task(bot, world_boss_task)
+                await run_task(bot, expedition_task)
                 await run_task(bot, start_guard_task)
                 await run_task(bot, daily_reward_task)
                 await run_task(bot, event_reward_task)

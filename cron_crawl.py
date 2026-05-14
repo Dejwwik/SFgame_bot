@@ -201,14 +201,14 @@ class CrawlSession(GameSession):
             text = await resp.text()
 
         data = parse_response(text)
-        if "error" in data or "ownplayersave.playerSave" not in data:
+        if "error" in data or "ownplayersavecharacter" not in data:
             raise LoginError(f"Crawl login failed: {data.get('error', 'unknown')}")
 
         self.login_data = data
         self.sid = data["cryptoid"]
         self.pg_session = data["sessionid"]
         self.player_name = data.get("ownplayername.r", self.username)
-        self.pg_player = data["ownplayersave.playerSave"].split("/")[1]
+        self.pg_player = data["ownplayersavecharacter"].split("/")[1]
         return self
 
 

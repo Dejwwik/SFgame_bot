@@ -217,7 +217,7 @@ class GameSession:
 
         self.login_data = data
         try:
-            self.pg_player = self.login_data["ownplayersave.playerSave"].split(
+            self.pg_player = self.login_data["ownplayersavecharacter"].split(
                 VALUES_DELIMITER
             )[1]
             self.sid = self.login_data["cryptoid"]

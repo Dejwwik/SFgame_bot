@@ -452,7 +452,7 @@ class Underworld:
 
             # Step 3: resolve name → player_id
             result = await self.session.request_and_update_async("PlayerLookAt", name)
-            return result["otherplayer.playerlookat"].split(VALUES_DELIMITER)[0]
+            return result["otherplayersavecharacter"].split(VALUES_DELIMITER)[1]
         except APIError as exc:
             logger.warning(f"Underworld: lure suggestion failed — {exc}")
             return None

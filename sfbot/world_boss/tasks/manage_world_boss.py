@@ -4,7 +4,7 @@ from sfbot.logging import get_main_logger
 
 
 def should_run(bot: Bot) -> bool:
-    return True
+    return bot.world_boss.is_active
 
 
 async def run(bot: Bot) -> None:

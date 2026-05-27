@@ -51,6 +51,7 @@ from sfbot.toilet import Toilet
 from sfbot.underworld import Underworld
 from sfbot.wheel import Wheel
 from sfbot.witch import Witch
+from sfbot.hellevator import Hellevator
 from sfbot.world_boss import WorldBoss
 
 
@@ -179,6 +180,7 @@ class Bot:
         self.arena_manager = ArenaManager(self.session)
         self.scrapbook = Scrapbook(self.session)
         self.world_boss = WorldBoss(self.session)
+        self.hellevator = Hellevator(self.session)
         self._parse_pending_unlocks()
         return self
 
@@ -232,6 +234,7 @@ class Bot:
         self.arena_manager.refresh()
         self.scrapbook.parse()
         self.world_boss.refresh()
+        self.hellevator.refresh()
         self._parse_pending_unlocks()
 
     def status(self) -> None:

@@ -10,6 +10,7 @@ def should_run(bot: Bot) -> bool:
 
 
 async def run(bot: Bot) -> None:
+    await bot.ensure_free_slot()
     try:
         await bot.tavern.quests.collect_quest_async()
         get_main_logger().info("Quest: collected reward")

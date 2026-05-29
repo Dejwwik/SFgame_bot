@@ -50,6 +50,7 @@ class ItemType(IntEnum):
     SPECIAL = 11
     POTION = 12
     SCRAPBOOK = 13
+    EPIC_ITEM_BAG = 14
     GEM = 15
     PET_ITEM = 16
     QUICK_SAND_GLASS = 17

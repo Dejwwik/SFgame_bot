@@ -53,18 +53,26 @@ async def run(bot: Bot) -> None:
             if egg_quest:
                 break
 
+    # Prioritize epic item bag quest — always pick it
+    epic_quest = None
+    if not egg_quest:
+        for quest in bot.tavern.quests.quests:
+            if quest.item is not None and quest.item.item_type == ItemType.EPIC_ITEM_BAG:
+                epic_quest = quest
+                break
+
     # Prioritize special quest
     special_quest = None
-    if not egg_quest:
+    if not egg_quest and not epic_quest:
         for quest in bot.tavern.quests.quests:
             if quest.item is not None and quest.item.item_type == ItemType.SPECIAL:
                 special_quest = quest
                 break
 
-    # Go for pet/special quest if available, otherwise best quest based on preference
-    best = egg_quest or special_quest or bot.tavern.quests.get_best_quest(player_state)
+    # Go for pet/epic/special quest if available, otherwise best quest based on preference
+    best = egg_quest or epic_quest or special_quest or bot.tavern.quests.get_best_quest(player_state)
     mins, secs = divmod(best.base_length, 60)
-    tag = " [egg]" if egg_quest else " [special]" if special_quest else ""
+    tag = " [egg]" if egg_quest else " [epic]" if epic_quest else " [special]" if special_quest else ""
     get_main_logger().info(
         f"  Quest: {best.location.name} ({mins}m{secs:02d}s, {best.base_silver // 100:,}g){tag}"
     )

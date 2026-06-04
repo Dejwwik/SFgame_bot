@@ -36,6 +36,7 @@ from sfbot.persistence.accounts import (
     upsert_account,
     upsert_character,
 )
+from sfbot.exceptions import LoginError
 from sfbot.session import GameSession, hash_password, sso_list_characters_async
 
 app = Flask(__name__, template_folder="templates")
@@ -393,9 +394,13 @@ def refresh_account(account_id: int):
             server_url = server_map.get(c["server_id"], "")
             character_id = c["id"]
             name = c["name"]
-            char_class = fetch_char_class(
-                username, password_hash, server_url, character_id
-            )
+            try:
+                char_class = fetch_char_class(
+                    username, password_hash, server_url, character_id
+                )
+            except Exception as e:
+                app.logger.warning(f"fetch_char_class failed for {name} ({character_id}): {e}")
+                continue
             upsert_character(
                 conn,
                 account_id,

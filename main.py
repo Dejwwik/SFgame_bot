@@ -79,6 +79,7 @@ from sfbot.wheel.tasks import spin_wheel as wheel_task
 from sfbot.witch.tasks import buy_enchantments as enchantments_task
 from sfbot.hellevator.tasks import run_hellevator as hellevator_task
 from sfbot.world_boss.tasks import manage_world_boss as world_boss_task
+from sfbot.session import init_server_map_async
 
 LOOP_SLEEP = 180
 JITTER_MAX = 60
@@ -260,7 +261,8 @@ async def run_account(bot: Bot) -> None:
             except InventoryFullError:
                 logger.warning("Inventory: could not free a slot, restarting loop")
             except InventoryStuckError:
-                logger.error("Inventory: completely stuck, manual intervention needed")
+                logger.error("Inventory: completely stuck, sleeping before retry")
+                await asyncio.sleep(ERROR_RETRY_DELAY)
             except GemExtractedAlert:
                 logger.info("Inventory: gem extracted, restarting loop")
             except KnownAPIError as e:
@@ -286,6 +288,7 @@ POLL_NEW_CHARACTERS_INTERVAL = 60
 
 async def main() -> None:
     logger = get_bot_main_logger()
+    await init_server_map_async()
     active_tasks: dict[str, asyncio.Task] = {}  # character_id -> task
 
     try:

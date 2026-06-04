@@ -36,8 +36,13 @@ from sfbot.persistence.accounts import (
     upsert_account,
     upsert_character,
 )
-from sfbot.exceptions import LoginError
-from sfbot.session import GameSession, hash_password, sso_list_characters_async
+from sfbot.session import (
+    SERVER_MAP_CACHE,
+    GameSession,
+    hash_password,
+    init_server_map_async,
+    sso_list_characters_async,
+)
 
 app = Flask(__name__, template_folder="templates")
 app.secret_key = os.environ.get("SECRET_KEY", "dev-fallback-key-change-in-production")
@@ -118,6 +123,8 @@ def fetch_char_class(
     """Log into a character's game server and return its class name."""
 
     async def run() -> str:
+        if not SERVER_MAP_CACHE:
+            await init_server_map_async()
         session = GameSession(username, password_hash, server, character_id)
         try:
             await session.login_async()
@@ -399,7 +406,9 @@ def refresh_account(account_id: int):
                     username, password_hash, server_url, character_id
                 )
             except Exception as e:
-                app.logger.warning(f"fetch_char_class failed for {name} ({character_id}): {e}")
+                app.logger.warning(
+                    f"fetch_char_class failed for {name} ({character_id}): {e}"
+                )
                 continue
             upsert_character(
                 conn,

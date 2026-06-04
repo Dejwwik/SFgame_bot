@@ -13,6 +13,13 @@ from sfbot.logging import get_main_logger
 SSO_URL = "https://sso.playa-games.com"
 CLIENT_ID = "i43nwwnmfc5tced4jtuk4auuygqghud2yopx"
 HASH_SALT = "ahHoj2woo1eeChiech6ohphoB7Aithoh"
+SERVER_MAP_CACHE: dict[str, int] = {}
+
+
+async def init_server_map_async() -> None:
+    async with aiohttp.ClientSession() as client:
+        global SERVER_MAP_CACHE
+        SERVER_MAP_CACHE = await fetch_server_id_map_async(client)
 
 
 def hash_password(password: str) -> str:
@@ -73,6 +80,20 @@ def check_response_for_error(result: dict[str, str]) -> dict[str, str]:
             if pattern in error_lower:
                 raise exc_cls(error)
         raise APIError(error)
+    return result
+
+
+async def fetch_server_id_map_async(client: aiohttp.ClientSession) -> dict[str, int]:
+    async with client.get("https://sfgame.net/config.json", timeout=aiohttp.ClientTimeout(total=10)) as resp:
+        data: dict[str, Any] = await resp.json(content_type=None)
+    result: dict[str, int] = {}
+    for s in data.get("servers", []):
+        sid = s.get("i")
+        for key in ("md", "d"):
+            domain = s.get(key, "")
+            if domain and sid is not None:
+                result[domain] = sid
+                break
     return result
 
 
@@ -187,8 +208,10 @@ class GameSession:
     async def login_async(self) -> "GameSession":
         await self._sso_login_async()
 
+        server_id = SERVER_MAP_CACHE.get(self.server)
+        suffix = f"/{server_id}" if server_id else ""
         char_params = base64.b64encode(
-            f"{self.account_uuid}/{self.character_id}/unity3d_webglplayer//295000000000".encode()
+            f"{self.account_uuid}/{self.character_id}/unity3d_webglplayer//305000000000{suffix}".encode()
         ).decode()
 
         async with self._client.get(

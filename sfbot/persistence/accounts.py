@@ -127,19 +127,19 @@ def upsert_character(
     existing value and the insert path defaults to disabled.
     """
     row = conn.execute(
-        "SELECT id FROM characters WHERE account_id = ? AND character_id = ? AND server = ?",
-        (account_id, character_id, server),
+        "SELECT id FROM characters WHERE account_id = ? AND character_id = ?",
+        (account_id, character_id),
     ).fetchone()
     if row:
         if enabled is not None:
             conn.execute(
-                "UPDATE characters SET name = ?, enabled = ?, char_class = COALESCE(?, char_class) WHERE id = ?",
-                (name, int(enabled), char_class, row["id"]),
+                "UPDATE characters SET name = ?, server = ?, enabled = ?, char_class = COALESCE(?, char_class) WHERE id = ?",
+                (name, server, int(enabled), char_class, row["id"]),
             )
         else:
             conn.execute(
-                "UPDATE characters SET name = ?, char_class = COALESCE(?, char_class) WHERE id = ?",
-                (name, char_class, row["id"]),
+                "UPDATE characters SET name = ?, server = ?, char_class = COALESCE(?, char_class) WHERE id = ?",
+                (name, server, char_class, row["id"]),
             )
         conn.commit()
         return row["id"]

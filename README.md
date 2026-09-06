@@ -167,9 +167,13 @@ logs/                # Per-character log files (bind-mounted)
 `account_data/` and `logs/` are not in the repository — both are created at
 runtime on first start, so a fresh clone will not contain them.
 
-The bot protocol was reverse-engineered with help from a local checkout of an
-open-source Rust Shakes & Fidget client, kept at `rust_reference/`. It is a
-local-only reference and is not distributed here.
+The game protocol was worked out with the help of
+[sf-api](https://github.com/the-marenga/sf-api) by
+[the-marenga](https://github.com/the-marenga) — an open-source Rust client for
+Shakes & Fidget, and the reference used throughout this project for request
+formats and response field layouts. A local checkout of it lives at
+`rust_reference/`; that directory is a local-only reference and is not
+distributed here.
 
 ## Data Storage
 
@@ -229,3 +233,18 @@ just clear
 # Docker rebuild
 just docker-restart
 ```
+
+## Acknowledgements
+
+This project would not exist without two open-source projects:
+
+- **[sf-api](https://github.com/the-marenga/sf-api)** by
+  [the-marenga](https://github.com/the-marenga) (MIT) — a Rust client for
+  Shakes & Fidget. It is the reference this bot's protocol layer was built
+  against: request formats, response field layouts, and the login flow.
+- **[sf-tools](https://github.com/HafisCZ/sf-tools)** by
+  [HafisCZ](https://github.com/HafisCZ) — the battle simulation engine in
+  `sfbot/dungeon/simulate/` is a Python port of its combat model.
+
+All credit for the underlying protocol and combat research goes to their
+authors.

@@ -4,6 +4,24 @@ Async bot for automating [Shakes & Fidget](https://www.sfgame.net/) game account
 
 Includes a **Flask web UI** for account/character management and a **Hall of Fame crawler** for scrapbook data collection.
 
+## Disclaimer
+
+This project is published for educational and research purposes: as a study in
+async Python architecture, protocol reverse-engineering, and Monte Carlo battle
+simulation. It is not affiliated with, endorsed by, or connected to Playa Games
+GmbH. No game assets, artwork, or client code are included in this repository.
+
+Automating gameplay almost certainly breaches the Shakes & Fidget Terms of
+Service. Running this against a live account may get that account suspended or
+terminated. Do not run it on an account you care about, and do not use it to
+gain an advantage over other players.
+
+Note that `cron_crawl.py` automatically registers throwaway game accounts and
+reads the public Hall of Fame across every server. If you would rather not do
+that, skip step 6 of the Quick Start; the bot runs fine without it.
+
+Provided as-is, with no warranty. You are responsible for how you use it.
+
 ## Features
 
 - **Multi-account support** — run any number of game accounts simultaneously as independent asyncio tasks
@@ -27,7 +45,7 @@ Includes a **Flask web UI** for account/character management and a **Hall of Fam
 
 ```bash
 # 1. Clone the repository
-git clone <repo-url> && cd SFgame
+git clone https://github.com/Dejwwik/SFgame_bot.git && cd SFgame_bot
 
 # 2. Install dependencies
 uv sync
@@ -144,8 +162,14 @@ sfbot/               # Core bot library (~32,000 LOC, 250+ Python files)
 templates/           # Flask HTML templates (8 pages)
 account_data/        # SQLite DB + per-character config JSON (bind-mounted)
 logs/                # Per-character log files (bind-mounted)
-rust_reference/      # Rust SF client — used as protocol reference
 ```
+
+`account_data/` and `logs/` are not in the repository — both are created at
+runtime on first start, so a fresh clone will not contain them.
+
+The bot protocol was reverse-engineered with help from a local checkout of an
+open-source Rust Shakes & Fidget client, kept at `rust_reference/`. It is a
+local-only reference and is not distributed here.
 
 ## Data Storage
 

@@ -1,7 +1,9 @@
 [project]
 name = "sfgame"
 version = "0.1.0"
-description = "Add your description here"
+description = "Async automation platform for the browser RPG Shakes & Fidget"
+license = "MIT"
+authors = [{ name = "Lukáš Kožušník" }]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

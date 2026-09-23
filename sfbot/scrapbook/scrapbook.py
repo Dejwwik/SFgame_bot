@@ -31,17 +31,17 @@ NORMAL_MODELS: dict[int, int] = {8: 21, 9: 16, 10: 37}  # amulet, ring, talisman
 WARRIOR_WEAPON_MODELS = 30
 DEFAULT_MODELS = 10
 
-# Epic model counts: weapons/shields/accessories have 21 continuous,
-# armor types (3-7) have 19 with a gap at offsets +10/+11 (models 59-60).
-EPIC_CONTINUOUS = 21
+# Epic model counts: weapons/shields/accessories have 23 continuous,
+# armor types (3-7) have 21 with a gap at offsets +10/+11 (models 59-60).
+EPIC_CONTINUOUS = 23
 EPIC_ARMOR_GAP = {9, 10}  # 0-based offsets to skip
 
 
 def build_valid_positions() -> frozenset[int]:
-    """Build set of all valid scrapbook item positions (1704 total).
+    """Build set of all valid scrapbook item positions (1748 total).
 
     Uses exact model counts from the game client: normal models vary by type,
-    epic items are 21 (continuous) for weapons/shields/accessories or 19
+    epic items are 23 (continuous) for weapons/shields/accessories or 21
     (with gap at models 59-60) for armor slots.
     """
     positions: set[int] = set()

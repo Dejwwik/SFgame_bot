@@ -1,9 +1,12 @@
 """Tests for scrapbook bitfield decoding and position mapping."""
 
 import base64
+from unittest.mock import MagicMock
 
 from sfbot.scrapbook.scrapbook import (
+    VALID_ITEM_POSITIONS,
     EquipmentIdent,
+    Scrapbook,
     decode_scrapbook,
     get_scrapbook_position,
     parse_equipment_idents,
@@ -201,3 +204,36 @@ class TestParseEquipmentIdents:
         assert len(idents) == 1
         assert idents[0].color == 0
         assert idents[0].model_id == 50
+
+
+# Real payload after the 23-epic update; the game showed "Items found 2,327/2,484"
+REAL_SCRAPBOOK: str = (
+    "___________________________________________7______wA_8AAAAAAAAAAAAH_____"
+    "_______________________________gAAAAAAAAAAAAH____4AAB____B__-P__________"
+    "______-AAAAAAAAAAAAAAAAAP__-gAA_____________wAAAAAAAAAABgD___wAAP_____4A"
+    "AAAAD___4AAP________________________wAAAAAAAAAAAAAAAAAAAAAAAAP__-AAA____"
+    "____wAAAAAAAD___4AAP_______8AAAAAAAA_5_4AAD________AAAAAAAAP-f-gAA______"
+    "__wAAAAAAAD_n_oAAP_______8AAAAAAAA_5_-AAD________AAAAAAAAP-f_AAA________"
+    "wAAAAAAAD___oAAP_______8AAAAAAAA_5_6AAD________AAAAAAAAP-f-AAA________wA"
+    "AAAAAAD_n_gAAP_______8AAAAAAAA_5_6AAD________AAAAAAAAP-f-AAA________wAAA"
+    "AAAAD___4AAP_______8AAAAAAAA_5_4AAD________AAAAAAAAP-f-gAA________wAAAAA"
+    "AAD_n_oAAP_______8AAAAAAAA_5_4AAD________AAAAAAAAP-f_AAAAA=="
+)
+
+
+class TestRealScrapbook:
+    def test_matches_in_game_found_count(self) -> None:
+        session: MagicMock = MagicMock()
+        session.login_data = {"scrapbook.r": REAL_SCRAPBOOK}
+        scrapbook = Scrapbook(session)
+        scrapbook.parse()
+        assert scrapbook.item_count == 1723
+        assert scrapbook.monster_count == 604
+        assert scrapbook.owned_total == 2327
+
+    def test_epic_model_72_is_valid(self) -> None:
+        # Epics now go up to model 72 (23 models): warrior weapon and footwear
+        weapon = EquipmentIdent(item_type=1, color_class=1, model_id=72, color=0)
+        boots = EquipmentIdent(item_type=4, color_class=1, model_id=72, color=0)
+        assert get_scrapbook_position(weapon) in VALID_ITEM_POSITIONS
+        assert get_scrapbook_position(boots) in VALID_ITEM_POSITIONS

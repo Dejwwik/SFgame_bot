@@ -58,7 +58,8 @@ MAX_BUILDING_LEVEL: dict[BuildingType, int] = {
     BuildingType.KEEPER: 15,
 }
 
-# Buildings whose level can exceed the Heart of Darkness level after a threshold
+# Buildings whose level can exceed the Heart of Darkness level after a threshold,
+# once every other building is maxed
 UNCAPPED_BY_HEART: dict[BuildingType, int] = {
     BuildingType.GOLD_PIT: 15,
 }
@@ -190,6 +191,8 @@ BUILD_QUEUE: list[tuple[int, list[BuildingType]]] = [
             BuildingType.GATE,
             BuildingType.TORTURE_CHAMBER,
             BuildingType.KEEPER,
+            BuildingType.GOBLIN_PIT,
+            BuildingType.TROLL_BLOCK,
         ],
     ),
     # Stage 7: Max utility buildings
@@ -201,7 +204,7 @@ BUILD_QUEUE: list[tuple[int, list[BuildingType]]] = [
             BuildingType.GOLD_PIT,
         ],
     ),
-    # Stage 8: Push Gold Pit beyond (uncapped by Heart)
+    # Stage 8: Push Gold Pit beyond (requires all other buildings maxed)
     (
         100,
         [

@@ -202,30 +202,30 @@ class Pets:
     def get_pet_to_feed(self, element: HabitatType) -> Pet | None:
         """Get the highest-priority pet to feed in a habitat.
 
-        Phase 1: First unlocked pet below level 100 from HABITAT_PRIORITY.
+        Phase 1: Furthest unlocked pet from HABITAT_PRIORITY, fed to level 100.
+                 If it is already 100+, hold fruits (previous pets are not fed).
         Phase 2: Once ALL phase-1 pets are at 100+, feed from HABITAT_PRIORITY_200
-                 to level 200 (only if habitat fully explored).
+                 to level 200 (only if all habitats are fully explored).
         """
         habitat = self.habitats[element]
         habitat_feed_priorities = PET_HABITAT_PRIORITY[element.value]
 
-        if not habitat.is_explored:
-            # Phase 1: feed priority pets to level 100
-            for index_priority in habitat_feed_priorities:
+        if not all(hab.is_explored for hab in self.habitats.values()):
+            # Phase 1: feed only the furthest unlocked priority pet to level 100
+            for index_priority in reversed(habitat_feed_priorities):
                 pet = habitat.pets[index_priority]
 
-                # Pet not yet obtained, wait for it to be unlocked
+                # Pet not yet obtained, fall back to the previous priority pet
                 if not pet.unlocked:
-                    return None
+                    continue
 
-                # First pet that hasn't hit level 100
-                if pet.level < 100:
-                    return pet
+                # Furthest pet is at 100+, hold fruits (never feed previous pets)
+                return pet if pet.level < 100 else None
 
-            # No pet to feed (all priority pets are at lvl 100+)
+            # No priority pet obtained yet
             return None
         else:
-            # Phase 2: feed to level 200 (only if habitat fully explored)
+            # Phase 2: feed to level 200 (only if all habitats are fully explored)
             for idx in PET_HABITAT_PRIORITY_200:
                 pet = habitat.pets[idx]
                 # Pet not yet obtained, skip

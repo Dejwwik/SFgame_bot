@@ -1,12 +1,14 @@
 """Scrapbook constants — boundaries, position formulas, item count."""
 
-# Scrapbook bitfield: positions 1..800 = monsters, 801..2396 = items
+# Scrapbook bitfield: positions 1..800 = monsters, 801+ = items
 # Game percentage = (monsters_found + items_found) / SCRAPBOOK_COUNT
-SCRAPBOOK_COUNT = 2396
+SCRAPBOOK_COUNT = 2484
 MONSTER_POSITIONS = 800
-ITEM_POSITIONS = SCRAPBOOK_COUNT - MONSTER_POSITIONS  # 1596
+ITEM_POSITIONS = 1748  # valid item slots (1272 common + 476 epic)
+MONSTER_COUNT = SCRAPBOOK_COUNT - ITEM_POSITIONS  # 736
 
-# Legendary items (model_id >= 90) are not tracked in the scrapbook
+# Legendary items (model_id >= 90) live in the separate legendaries.r bitfield
+# and do not count towards scrapbook completion
 MAX_MODEL_ID = 90
 
 # EquipmentIdent boundaries for scrapbook position calculation.

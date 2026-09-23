@@ -89,10 +89,21 @@ class TestHeartGate:
         assert pick_upgrade(building_levels) == B.HEART_OF_DARKNESS
 
     def test_gold_pit_is_uncapped_by_heart(self):
-        building_levels = levels(HEART_OF_DARKNESS=15, GOLD_PIT=50)
+        building_levels = {**all_at_max(), B.GOLD_PIT: 50}
         uw = make_underworld(building_levels=building_levels)
         # Gold Pit level 50 > Heart=15 but should still be upgradeable
         assert uw.can_upgrade(B.GOLD_PIT, UNLIMITED, UNLIMITED) is True
+
+    def test_gold_pit_past_15_blocked_until_all_buildings_maxed(self):
+        building_levels = {**all_at_max(), B.GOLD_PIT: 15, B.GOBLIN_PIT: 14, B.TROLL_BLOCK: 13}
+        uw = make_underworld(building_levels=building_levels)
+        assert uw.can_upgrade(B.GOLD_PIT, UNLIMITED, UNLIMITED) is False
+        # Lowest-level building of the pending stage is picked first
+        assert uw.pick_upgrade(UNLIMITED, UNLIMITED) == B.TROLL_BLOCK
+
+    def test_gold_pit_past_15_allowed_once_all_buildings_maxed(self):
+        building_levels = {**all_at_max(), B.GOLD_PIT: 15}
+        assert pick_upgrade(building_levels) == B.GOLD_PIT
 
     def test_soul_extractor_capped_at_heart_level(self):
         building_levels = levels(HEART_OF_DARKNESS=5, SOUL_EXTRACTOR=5)

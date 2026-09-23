@@ -169,7 +169,20 @@ Runs every bot loop iteration (~180s), after `update_queue`.
 
 ## Scrapbook Position Calculation
 
-The scrapbook bitfield has **2396 total positions**: 1–800 = monsters, 801+ = items.
+The game counts **2484 scrapbook entries**: 1748 items + 736 monsters. In the `scrapbook.r` bitfield, bits 1–800 = monsters, 801+ = items.
+
+Item slots per category (verified against the in-game Scrapbook screen):
+
+| Category | Common | Epic |
+|---|---|---|
+| Armor (per class, 5 slots) | 250 (10 models × 5 colors × 5 slots) | 105 (21 per slot) |
+| Melee / Ranged / Magic weapons | 150 / 50 / 50 | 23 each |
+| Shields | 50 | 23 |
+| Amulets / Rings / Talismans | 105 / 80 / 37 | 23 each |
+
+Epic models are 50–72 (23 models). Armor slots skip models 59–60, so they have 21.
+
+Legendary items (model ≥ 90) are tracked in a separate `legendaries.r` bitfield and do **not** count towards completion, so they are ignored.
 
 ### Equipment Ident Parsing
 From `otherplayersaveequipment` (10 equipment slots × 19 fields, `/`-delimited):
@@ -194,9 +207,10 @@ Color is derived from a checksum of item stats: `(damage_max + damage_min + attr
 
 | Constant | Value | Location | Purpose |
 |---|---|---|---|
-| `SCRAPBOOK_COUNT` | 2396 | constants.py | Total scrapbook positions |
-| `MONSTER_POSITIONS` | 800 | constants.py | Positions 1–800 |
-| `ITEM_POSITIONS` | 1596 | constants.py | Positions 801–2396 |
+| `SCRAPBOOK_COUNT` | 2484 | constants.py | Total scrapbook entries (game's denominator) |
+| `MONSTER_POSITIONS` | 800 | constants.py | Monster bit range 1–800 |
+| `ITEM_POSITIONS` | 1748 | constants.py | Valid item slots (1272 common + 476 epic) |
+| `MONSTER_COUNT` | 736 | constants.py | Monsters counted by the game |
 | `MAX_MODEL_ID` | 90 | constants.py | Legendary cutoff |
 | `QUEUE_REFRESH_INTERVAL` | 36,000 | constants.py | 10h between re-scores |
 | `MAX_QUEUE_SIZE` | 50 | constants.py | Max queued opponents |

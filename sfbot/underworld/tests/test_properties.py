@@ -147,6 +147,20 @@ class TestUnitUpgrade:
         )
         assert uw.can_upgrade_unit(UnitType.GOBLIN) is False
 
+    def test_pick_unit_upgrade_uses_upgraded_amount(self):
+        uw = make_underworld(
+            building_levels={**all_at_max(), B.GOLD_PIT: 15},
+            unit_upgraded_amount={
+                UnitType.GOBLIN: 380,
+                UnitType.TROLL: 410,
+                UnitType.KEEPER: 410,
+            },
+            unit_upgrade_costs={u: (1, 1, 1) for u in UnitType},
+        )
+        # Battle level (unit_levels) is ignored; stage 4 pushes Keeper to 600
+        uw.unit_levels = {u: 600 for u in UnitType}
+        assert uw.pick_unit_upgrade() == UnitType.KEEPER
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Extreme / Impossible Game States

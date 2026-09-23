@@ -51,7 +51,7 @@ def make_underworld(
     building_costs: dict[BuildingType, tuple[int, int, int]] | None = None,
     upgrading: BuildingType | None = None,
     upgrade_finish: int = 0,
-    unit_levels: dict[UnitType, int] | None = None,
+    unit_upgraded_amount: dict[UnitType, int] | None = None,
     unit_counts: dict[UnitType, int] | None = None,
     unit_upgrade_costs: dict[UnitType, tuple[int, int, int]] | None = None,
     lure_level: int = 0,
@@ -72,8 +72,8 @@ def make_underworld(
         uw.building_costs = free_costs()
     uw.upgrade_target = upgrading
     uw.upgrade_finish = upgrade_finish
-    if unit_levels is not None:
-        uw.unit_levels = dict(unit_levels)
+    if unit_upgraded_amount is not None:
+        uw.unit_upgraded_amount = dict(unit_upgraded_amount)
     if unit_counts is not None:
         uw.unit_counts = dict(unit_counts)
     if unit_upgrade_costs is not None:

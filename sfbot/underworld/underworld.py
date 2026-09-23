@@ -269,6 +269,11 @@ class Underworld:
             if uncap is not None and level >= uncap:
                 if self.heart_level < required:
                     return False
+                # Going past the cap requires every other building to be maxed
+                if not all(
+                    self.is_building_maxed(b) for b in BuildingType if b != building
+                ):
+                    return False
             else:
                 if self.heart_level < max(required, level + 1):
                     return False
@@ -333,7 +338,7 @@ class Underworld:
     def pick_unit_upgrade(self) -> UnitType | None:
         """Pick the next unit to upgrade based on the staged queue."""
         for i, (target_level, units) in enumerate(UNIT_UPGRADE_QUEUE):
-            if all(self.unit_levels.get(u, 0) >= target_level for u in units):
+            if all(self.unit_upgraded_amount.get(u, 0) >= target_level for u in units):
                 continue
             # Last stage: pause until Gold Pit reaches gate level
             if (
@@ -344,12 +349,12 @@ class Underworld:
             candidates = [
                 u
                 for u in units
-                if self.unit_levels.get(u, 0) < target_level
+                if self.unit_upgraded_amount.get(u, 0) < target_level
                 and self.can_upgrade_unit(u)
             ]
             if not candidates:
                 return None
-            return min(candidates, key=lambda u: self.unit_levels.get(u, 0))
+            return min(candidates, key=lambda u: self.unit_upgraded_amount.get(u, 0))
         return None
 
     # --- Async API methods ---
@@ -429,7 +434,7 @@ class Underworld:
         try:
             await self.session.request_and_update_async("UnderworldUpgradeUnit", param)
             self.refresh()
-            lvl = self.unit_levels.get(unit, 0)
+            lvl = self.unit_upgraded_amount.get(unit, 0)
             logger.info(f"Underworld: upgraded {unit.name} to Lv{lvl}")
         except APIError as exc:
             logger.warning(f"Underworld: unit upgrade failed — {exc}")

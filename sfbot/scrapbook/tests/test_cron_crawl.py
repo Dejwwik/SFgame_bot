@@ -1,6 +1,9 @@
+import asyncio
 import hashlib
 import re
+import sqlite3
 import string
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +14,7 @@ from cron_crawl import (
     sha1,
     unique_servers,
 )
+from sfbot.persistence import accounts
 
 
 class TestSha1:
@@ -63,23 +67,37 @@ class TestRandomPassword:
 
 class TestUniqueServers:
     @pytest.fixture(autouse=True)
-    def _clear_char_vars(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        import os
+    def _temp_db(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(accounts, "DB_PATH", str(tmp_path / "accounts.db"))
+        accounts.init_db()
+        conn: sqlite3.Connection = accounts.connect_sync()
+        try:
+            self.account_id: int = accounts.upsert_account(conn, "user", "hash")
+        finally:
+            conn.close()
 
-        for k in list(os.environ):
-            if k.startswith("SF_CHAR_"):
-                monkeypatch.delenv(k)
+    def add_character(self, character_id: str, server: str, enabled: bool) -> None:
+        conn: sqlite3.Connection = accounts.connect_sync()
+        try:
+            conn.execute(
+                "INSERT INTO characters (account_id, name, character_id, server, enabled)"
+                " VALUES (?, ?, ?, ?, ?)",
+                (self.account_id, character_id, character_id, server, int(enabled)),
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
-    def test_parses_env_vars(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setenv("SF_CHAR_1", "alice,123,s1.sfgame.net")
-        monkeypatch.setenv("SF_CHAR_2", "bob,456,s2.sfgame.net")
-        monkeypatch.setenv("SF_CHAR_3", "carol,789,s1.sfgame.net")
-        assert unique_servers() == ["s1.sfgame.net", "s2.sfgame.net"]
+    def test_returns_sorted_unique_servers(self) -> None:
+        self.add_character("1", "s2.sfgame.net", True)
+        self.add_character("2", "s1.sfgame.net", True)
+        self.add_character("3", "s2.sfgame.net", True)
+        assert asyncio.run(unique_servers()) == ["s1.sfgame.net", "s2.sfgame.net"]
 
-    def test_empty_when_no_vars(self) -> None:
-        assert unique_servers() == []
+    def test_empty_when_no_characters(self) -> None:
+        assert asyncio.run(unique_servers()) == []
 
-    def test_ignores_malformed(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setenv("SF_CHAR_1", "only_two_parts,123")
-        monkeypatch.setenv("SF_CHAR_2", "ok,456,s1.sfgame.net")
-        assert unique_servers() == ["s1.sfgame.net"]
+    def test_ignores_disabled_characters(self) -> None:
+        self.add_character("1", "s1.sfgame.net", True)
+        self.add_character("2", "s3.sfgame.net", False)
+        assert asyncio.run(unique_servers()) == ["s1.sfgame.net"]

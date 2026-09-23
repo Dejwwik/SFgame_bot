@@ -93,9 +93,9 @@ BUILD_QUEUE: list[tuple[int, list[BuildingType]]] = [
         1,
         [
             BuildingType.FORTRESS,
+            BuildingType.LABORERS_QUARTERS,
             BuildingType.WOODCUTTER,
             BuildingType.QUARRY,
-            BuildingType.LABORERS_QUARTERS,
             BuildingType.GEM_MINE,
         ],
     ),

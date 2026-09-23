@@ -263,6 +263,11 @@ async def run_account(bot: Bot) -> None:
             except InventoryStuckError:
                 logger.error("Inventory: completely stuck, sleeping before retry")
                 await asyncio.sleep(ERROR_RETRY_DELAY)
+                # Fresh login so manual fixes (e.g. selling items) are picked up
+                try:
+                    await bot.session.relogin_async()
+                except Exception as e:
+                    logger.warning(f"Relogin after stuck inventory failed: {e}")
             except GemExtractedAlert:
                 logger.info("Inventory: gem extracted, restarting loop")
             except KnownAPIError as e:

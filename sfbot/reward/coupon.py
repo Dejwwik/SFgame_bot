@@ -5,7 +5,8 @@ import aiohttp
 from sfbot.constants import VALUES_DELIMITER
 from sfbot.exceptions import APIError
 from sfbot.logging import get_main_logger
-from sfbot.session import COMMON_HEADERS, SERVER_MAP_CACHE, GameSession
+from sfbot import session as session_module
+from sfbot.session import COMMON_HEADERS, GameSession
 
 COUPON_URL = "https://coupon.playa-games.com/redeem"
 PAYMENT_STRING_SUFFIX = "1"
@@ -23,7 +24,7 @@ class Coupon:
     @property
     def payment_string(self) -> str:
         save = self.session.login_data["ownplayersavecharacter"].split(VALUES_DELIMITER)
-        server_id = SERVER_MAP_CACHE.get(self.session.server)
+        server_id = session_module.SERVER_MAP_CACHE.get(self.session.server)
         if server_id is None:
             raise APIError(f"Unknown server id for {self.session.server}")
         return f"{save[1]}_{save[0]}_{server_id}_{PAYMENT_STRING_SUFFIX}"

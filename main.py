@@ -60,6 +60,7 @@ from sfbot.reward.tasks import claim_calendar as calendar_task
 from sfbot.reward.tasks import claim_daily_task as daily_reward_task
 from sfbot.reward.tasks import claim_event as event_reward_task
 from sfbot.reward.tasks import claim_pending as mail_reward_task
+from sfbot.reward.tasks import redeem_coupons as redeem_coupons_task
 from sfbot.scrapbook.tasks import update_queue as scrapbook_task
 from sfbot.shop.tasks import buy_and_equip_better_item as buy_better_items_task
 from sfbot.shop.tasks import buy_special_items as buy_special_items_task
@@ -253,6 +254,7 @@ async def run_account(bot: Bot) -> None:
                 await run_task(bot, start_guard_task)
                 await run_task(bot, daily_reward_task)
                 await run_task(bot, event_reward_task)
+                await run_task(bot, redeem_coupons_task)
                 await run_task(bot, mail_reward_task)
 
                 delay = LOOP_SLEEP + random.randint(0, JITTER_MAX)

@@ -309,7 +309,7 @@ arena_manager_sacrifice → arena_manager_upgrade → arena_manager_buy →
 prepare_elixirs → potions → mount → attributes → start_quest → arena → scrapbook →
 fight_opponent → dice → dungeon_portal →
 unlock_features → fight_pets → fight_pet_dungeon → feed_pet → legendary_dungeon →
-start_guard → daily_reward → event_reward → mail_reward → sleep 180s+jitter
+start_guard → daily_reward → event_reward → redeem_coupons → mail_reward → sleep 180s+jitter
 ```
 3. **Error handling in task loop**: `LoginError` → `warning()` + retry, `KnownAPIError` → `error()` + retry, other → `exception()` + retry. All sleep `ERROR_RETRY_DELAY`.
 

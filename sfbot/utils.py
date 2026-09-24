@@ -63,3 +63,32 @@ def format_large_number(n: int) -> str:
             value = n / threshold
             return f"{value:,.2f} {suffix}"
     return f"{n:,}"
+
+
+SF_ESCAPES: dict[str, str] = {
+    "b": "\n",
+    "c": ":",
+    "P": "%",
+    "s": "/",
+    "p": "|",
+    "+": "&",
+    "q": '"',
+    "r": "#",
+    "C": ",",
+    "S": ";",
+    "d": "$",
+}
+
+
+def from_sf_string(val: str) -> str:
+    out: list[str] = []
+    escaped = False
+    for ch in val:
+        if escaped:
+            out.append(SF_ESCAPES.get(ch, ch))
+            escaped = False
+        elif ch == "$":
+            escaped = True
+        else:
+            out.append(ch)
+    return "".join(out)

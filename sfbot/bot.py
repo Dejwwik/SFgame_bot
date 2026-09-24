@@ -40,7 +40,14 @@ from sfbot.persistence.accounts import connect_async, upsert_character_stats_asy
 from sfbot.pets import Pets
 from sfbot.pets.pet_reqs import PetRequirement
 from sfbot.resources import Resources
-from sfbot.reward import CalendarReward, DailyReward, EventReward, MailReward
+from sfbot.reward import (
+    CalendarReward,
+    Coupon,
+    DailyReward,
+    EventReward,
+    Inbox,
+    MailReward,
+)
 from sfbot.scrapbook import Scrapbook
 from sfbot.session import GameSession
 from sfbot.shop import Shop
@@ -177,6 +184,8 @@ class Bot:
         self.daily_reward = DailyReward(self.session)
         self.event_reward = EventReward(self.session)
         self.mail_reward = MailReward(self.session)
+        self.coupon = Coupon(self.session)
+        self.inbox = Inbox(self.session)
         self.arena_manager = ArenaManager(self.session)
         self.scrapbook = Scrapbook(self.session)
         self.world_boss = WorldBoss(self.session)

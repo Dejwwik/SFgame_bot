@@ -12,8 +12,12 @@ async def run(bot: Bot) -> None:
     msg_id = bot.inbox.message_ids[0]
     try:
         text = await bot.inbox.read_async(msg_id)
-        for code in extract_coupon_candidates(text):
-            await bot.coupon.redeem_async(code)
+        codes = extract_coupon_candidates(text)
+        redeemed = [code for code in codes if await bot.coupon.redeem_async(code)]
         await bot.inbox.delete_async(msg_id)
+        get_main_logger().info(
+            f"Coupon: deleted message {msg_id}, tried {len(codes)} words, "
+            f"redeemed {redeemed or 'none'}"
+        )
     except APIError as exc:
         get_main_logger().warning(f"Coupon: message {msg_id}: {exc}")

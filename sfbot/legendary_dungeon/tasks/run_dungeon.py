@@ -20,7 +20,7 @@ def should_run(bot: Bot) -> bool:
         return False
     d = ld.dungeon
     if d.stage == DungeonStage.COMPLETED:
-        return False
+        return ld.is_enterable
     if d.stage == DungeonStage.NOT_ENTERED:
         return True
     if not d.is_alive:

@@ -936,8 +936,15 @@ class LegendaryDungeon:
         stage = d.stage
 
         if stage == DungeonStage.COMPLETED:
-            self.log_info("STOPPED: dungeon completed")
-            return False
+            if not self.is_enterable:
+                self.log_info("STOPPED: dungeon completed, event closed for new runs")
+                return False
+            self.log_info("   Action: dungeon completed, STARTING new run...")
+            await self.enter_async()
+            if self.dungeon is not None and self.dungeon.stage == DungeonStage.COMPLETED:
+                logger.warning("Dungeon: could not start a new run after completion")
+                return False
+            return True
 
         if stage == DungeonStage.NOT_ENTERED:
             if not self.should_start_run():

@@ -47,7 +47,7 @@ The dungeon operates as a state machine. Each API response puts the player in on
 | `ROOM_SPECIAL` | Gem selection after boss | Score gems, pick the best |
 | `ROOM_FINISHED` | Room completed | Collect loot, advance |
 | `HEALING` | Dead, healing in progress | Stop — wait for next cycle |
-| `COMPLETED` | Run finished (floor 100 cleared) | Stop — do not re-enter |
+| `COMPLETED` | Run finished (floor 100 cleared) | Start a new run while `is_enterable` (before `end_ts`) |
 
 The main loop (`run_async`) calls `step_async()` up to 300 times. Each step reads the current stage and performs the appropriate action.
 
@@ -188,7 +188,7 @@ The server provides three timestamps via `iadungeontime`: `start_ts`, `end_ts`, 
 | `is_enterable` | `start_ts` to `end_ts` | Normal entry window |
 | `is_active` | `start_ts` to `close_ts` | Event still exists (grace period after `end_ts`) |
 
-Between `end_ts` and `close_ts`, the game allows one final re-entry for characters in HEALING state. The bot uses `is_active` (not `is_enterable`) to gate entry in `should_run()` and `step_async()`, so it can take advantage of this grace period. `COMPLETED` always returns `False` immediately.
+Between `end_ts` and `close_ts`, the game allows one final re-entry for characters in HEALING state. The bot uses `is_active` (not `is_enterable`) to gate entry in `should_run()` and `step_async()`, so it can take advantage of this grace period. `COMPLETED` re-enters only while `is_enterable` — new runs cannot be started after `end_ts`.
 
 ## Room Handling
 

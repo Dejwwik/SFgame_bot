@@ -8,7 +8,14 @@ import pytest
 from sfbot.constants import GemAttr, PotionAttributeType, PotionSize, Rarity
 from sfbot.exceptions import GemExtractedAlert, InventoryStuckError
 
-from .conftest import make_gem, make_gemmed_item, make_inventory, make_item, make_potion
+from .conftest import (
+    make_gem,
+    make_gemmed_item,
+    make_inventory,
+    make_item,
+    make_potion,
+    make_wings,
+)
 
 
 def _call_kwargs(
@@ -333,3 +340,12 @@ class TestNothingToFree:
                     **_call_kwargs(main_potion_attr=PotionAttributeType.INTELLIGENCE)
                 )
             )
+
+
+class TestStage19Wings:
+    def test_sells_wings_as_last_resort(self) -> None:
+        inv = make_inventory([make_wings()])
+        inv.sell_item_at_slot_async = AsyncMock(return_value=True)
+        result: bool = _run(inv.ensure_free_slot_async(**_call_kwargs()))
+        assert result is True
+        assert inv.sell_item_at_slot_async.call_args.args[1] == "[19]"

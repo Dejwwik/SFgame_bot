@@ -7,7 +7,14 @@ from sfbot.constants import (
 )
 from sfbot.inventory.inventory import get_max_potion_size
 
-from .conftest import make_gem, make_gemmed_item, make_inventory, make_item, make_potion
+from .conftest import (
+    make_gem,
+    make_gemmed_item,
+    make_inventory,
+    make_item,
+    make_potion,
+    make_wings,
+)
 
 _KEEP_POTIONS = {PotionAttributeType.STRENGTH, PotionAttributeType.CONSTITUTION}
 _KEEP_GEMS = {GemAttr.STRENGTH, GemAttr.CONSTITUTION}
@@ -390,3 +397,17 @@ class TestFindItemWithExtractableGem:
     def test_non_equippable_skipped(self):
         inv = make_inventory([make_potion()])
         assert inv.get_item_with_extractable_gem(100.0, self.KEEP) is None
+
+
+
+# ── get_wings ──
+
+
+class TestGetWings:
+    def test_finds_wings(self) -> None:
+        inv = make_inventory([make_potion(), make_wings()])
+        assert len(inv.get_wings()) == 1
+
+    def test_ignores_regular_potions(self) -> None:
+        inv = make_inventory([make_potion(), make_potion()])
+        assert inv.get_wings() == []

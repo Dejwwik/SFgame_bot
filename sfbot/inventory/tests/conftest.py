@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 from sfbot.constants import (
+    WINGS_MODEL_ID,
     Cost,
     GemAttr,
     GemSlot,
@@ -93,6 +94,13 @@ def make_potion(
     )
     item.potion_attr = attr
     item.potion_size = size
+    return item
+
+
+def make_wings() -> Item:
+    item = make_potion()
+    item.model = WINGS_MODEL_ID
+    item.model_id = WINGS_MODEL_ID
     return item
 
 

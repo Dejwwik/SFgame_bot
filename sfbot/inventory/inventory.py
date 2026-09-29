@@ -229,6 +229,13 @@ class Inventory:
         """True if inventory can cover one 144h dungeon cycle minus credits."""
         return bool(self.get_potions_for_dungeon(main_attr, credits))
 
+    def get_wings(self) -> list[InventorySlot]:
+        return [
+            InventorySlot(0, p.wire, p.item)
+            for p in self.get_potions()
+            if p.item and p.item.model == WINGS_MODEL_ID
+        ]
+
     # --- Finders for ensure_free_slot priority chain ---
 
     def get_off_attr_potion(
@@ -782,6 +789,14 @@ class Inventory:
         if freed:
             return True
         logger.debug("Inventory: passed [18]")
+
+        # --- 19. Last resort: sell Wings ---
+        logger.debug("Inventory: entering [19] wings")
+        if (wings := self.get_wings()) and await self.sell_item_at_slot_async(
+            wings[0], "[19]"
+        ):
+            return True
+        logger.debug("Inventory: passed [19]")
 
         raise InventoryStuckError("could not free a backpack slot")
 

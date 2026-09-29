@@ -412,7 +412,7 @@ A `ComparisonProfile` captures one character's scoring context:
 ## Inventory System (`sfbot/inventory/`)
 
 ### Overview
-`Inventory` manages the backpack: parsing, item/gem equipping, selling, and the 16-stage free-slot priority chain. It uses **dependency injection** — `Smith`, `Toilet`, and `ComparisonProfile` list are passed as params to `ensure_free_slot_async()`, not imported directly.
+`Inventory` manages the backpack: parsing, item/gem equipping, selling, and the 19-stage free-slot priority chain. It uses **dependency injection** — `Smith`, `Toilet`, and `ComparisonProfile` list are passed as params to `ensure_free_slot_async()`, not imported directly.
 
 ### Key Types
 - **`InventorySlot`**: `(index, wire, item)` — a single occupied slot
@@ -434,7 +434,7 @@ A `ComparisonProfile` captures one character's scoring context:
 5. Loop until no more upgrades found
 
 ### Free Slot Priority Chain (`ensure_free_slot_async`)
-Called from `bot.ensure_free_slot()` when backpack is full. Pre-requisites: equip best items/gems first. Then the 16-stage chain tries progressively more aggressive disposal:
+Called from `bot.ensure_free_slot()` when backpack is full. Pre-requisites: equip best items/gems first. Then the 19-stage chain tries progressively more aggressive disposal:
 
 **Gem protection sets:**
 - `all_protected = keep_gem_attrs | {LEGENDARY, ALL}` — main+CON+legendary+black
@@ -459,6 +459,9 @@ Called from `bot.ensure_free_slot()` when backpack is full. Pre-requisites: equi
 | 14 | Extract gem from item | `get_item_with_extractable_gem()` | Extracts legendary always; main-attr/CON above avg × GEM_IMPROVEMENT_RATIO; black above threshold; raises `GemExtractedAlert` |
 | 15 | Force-socket or sell worst black gem | `get_worst_gem_by_attr(BLACK)` | Force-sockets if any improvement (old gem destroyed), otherwise sells worst black gem |
 | 16 | Force-socket or sell worst legendary gem | `get_worst_gem_by_attr(LEGENDARY)` | Force-sockets if any improvement (old gem destroyed), otherwise sells worst legendary gem |
+| 17 | Sell any equippable item | `get_equippable_items()` | None |
+| 18 | Drink main/CON potion | `drink_potion_to_free_slot_async()` | Kills a useless active potion to make room |
+| 19 | Sell Wings | `get_wings()` | Last resort before `InventoryStuckError` — sells the first life potion |
 
 **Threshold math:** `value < average_single_attr_gem × GEM_IMPROVEMENT_RATIO × BLACK_GEM_ATTR_RATIO` for black gems.
 
